@@ -1,0 +1,202 @@
+.extDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #87CEEB, #4682B4);
+    padding: 20px;
+}
+
+.extDiv2 {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.titlePageDiv {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.titlePage {
+    color: #2C3E50;
+    font-size: 2.5rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.subTitlePageDiv {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.subTitlePage {
+    color: #566573;
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.fillLogin, .mb-3 {
+    position: relative;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #E5E7E9;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4682B4;
+    box-shadow: 0 0 0 2px rgba(70, 130, 180, 0.2);
+}
+
+.form-control::placeholder {
+    color: #95A5A6;
+}
+
+.loginBtn {
+    background-color: #4682B4;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.loginBtn:hover {
+    background-color: #357ABD;
+}
+
+.loginBtn:active {
+    transform: scale(0.98);
+}
+
+.regLink {
+    display: block;
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #4682B4;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.regLink:hover {
+    color: #357ABD;
+    text-decoration: underline;
+}
+
+.loginPage {
+  min-height: 100vh;
+  background-image: url('../assets/hotels.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+.loginOverlay {
+  min-height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.707) 0%, rgba(0, 0, 0, 0.612) 25%);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.loginBox {
+  width: min(460px, 92vw);
+  background: linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.36));
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  color: #fff;
+}
+
+.loginTitle { font-size: 26px; font-weight: 900; margin: 0 0 8px 0; text-align: center; }
+.loginSub { opacity: 0.95; margin: 0 0 18px 0; text-align: center; }
+
+.loginForm { display: grid; gap: 12px; }
+.fillLogin { position: relative; }
+
+.loginInput {
+  width: 100%;
+  padding: 12px 0px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+.loginInput::placeholder { color: rgba(255,255,255,0.85); }
+.loginInput:focus {
+  border-color: rgba(102, 178, 255, 0.9);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.loginActions { display: flex; justify-content: center; margin-top: 6px; }
+
+.loginBtn {
+  background: linear-gradient(135deg, #ffffff41, #c1c1c18a);
+  color: #fff;
+  border: 2px solid rgb(184, 184, 184);
+  border-radius: 25px;
+  padding: 10px 22px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease, border-radius 0.2s ease, background 0.2s ease;
+  box-shadow: 0 8px 16px rgba(59, 178, 184, 0.25);
+}
+.loginBtn:hover {
+  background: linear-gradient(135deg, #42e69488, #3bb2b853);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(59, 178, 184, 0.35);
+  border-radius: 30px;
+}
+
+.regLink {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  color: #e6f0ff;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+.regLink:hover { color: #fff; text-decoration: underline; }
+
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden; clip: rect(1px, 1px, 1px, 1px);
+}
+
+@media (max-width: 480px) {
+  .loginBox { border-radius: 16px; padding: 18px; }
+  .loginTitle { font-size: 22px; }
+}

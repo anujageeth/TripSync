@@ -1,0 +1,93 @@
+.navbarGlass {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  background: linear-gradient(rgba(130, 130, 130, 0.14), rgba(255, 255, 255, 0.24));
+  backdrop-filter: blur(100px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.navInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.navBrand {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+.navBrand:hover { opacity: 0.9; }
+
+.navBrandImg {
+  height: 50px;
+  width: auto;
+  display: block;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 16px;
+  border-radius: 30px;
+
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+
+  border: none;
+
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.35);
+  color: #000;
+}
+
+.navLink.active {
+  background: #5a5a5a;
+  border-color: #007bff;
+  color: #ffffff;
+}
+
+.navButton {
+  cursor: pointer;
+  border: none;
+  color: #505050;
+}
+
+@media (max-width: 768px) {
+  .navInner {
+    padding: 10px 14px;
+  }
+  .navBrand {
+    font-size: 18px;
+  }
+  .navLinks {
+    gap: 8px;
+  }
+}

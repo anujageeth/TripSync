@@ -1,0 +1,216 @@
+.container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #87CEEB, #4682B4);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.titleHomePage {
+    color: white;
+    font-size: 2.5rem;
+    text-align: center;
+    margin: 1rem 0 2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.plannerPage {
+  min-height: 100vh;
+  background-image: url('../assets/hotels.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+.plannerOverlay {
+  min-height: 100vh;
+  background: linear-gradient(rgba(0,0,0,0.707), rgba(0,0,0,0.438));
+  backdrop-filter: blur(4px);
+}
+.plannerContainer { max-width: 500px; margin: 0 auto; padding: 20px; color: #fff; }
+
+.plannerBox {
+  background: linear-gradient(rgba(255,255,255,0.178), rgba(255,255,255,0.386));
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.plannerActionButtons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.formControlPlanner {
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3));
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  transition: background .2s, border-color .2s, box-shadow .2s, color .2s;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.formControlPlanner:hover { background: rgba(255,255,255,0.35); border-radius: 20px; }
+.formControlPlanner:focus {
+  outline: none;
+  border-color: rgba(102,178,255,0.9);
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+  background: rgba(255,255,255,0.42);
+}
+.d-flex {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+#planDateInput {
+    max-width: 430px;
+    padding-bottom: 8px;
+}
+
+.placeAddBtn {
+  padding: 8px 30px;
+  background: #f8f9fa;
+  color: #000;
+  border-radius: 20px;
+  border: none;
+  font-weight: 750;
+  margin-right: 8px;
+  transition: background .2s, color .2s;
+  cursor: pointer;
+}
+
+.placeAddBtn:hover { background: #000000; color: #fff; }
+
+.placeAddBtn:disabled {
+    background-color: #95A5A6;
+    cursor: not-allowed;
+}
+
+#removePlaceBtn {
+    background-color: #E74C3C;
+    min-width: 100px;
+}
+
+#removePlaceBtn:hover {
+    background-color: #C0392B;
+}
+
+#savePlanBtn {
+    background-color: #27AE60;
+}
+
+#savePlanBtn:hover {
+    background-color: #219A52;
+}
+
+#resetPlanBtn {
+    background-color: #ffffff2b;
+    color: #ffffff;
+}
+
+#viewHotelDetailsBtn {
+    margin-bottom: 5px;
+}
+
+.mt-4 {
+    margin-top: 2rem;
+    text-align: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: rgba(39, 174, 96, 0.9);
+    color: white;
+}
+
+.selectedPlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.placePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(213, 189, 32, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+.pillRemove {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pillRemove:hover {
+  background: rgba(0, 0, 0, 0.12);
+  color: #000;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .plannerBox {
+        padding: 1.5rem;
+    }
+
+    .titleHomePage {
+        font-size: 2rem;
+    }
+
+    .d-flex {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .placeAddBtn {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .titleHomePage {
+        font-size: 1.8rem;
+    }
+
+    .formControlPlanner {
+        padding: 10px;
+    }
+}
