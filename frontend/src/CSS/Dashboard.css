@@ -224,7 +224,11 @@
   }
 
   .recentSection {
-    padding: 0.75rem;
+    width: 100%;
+    max-width: 98vw;
+    border-radius: 16px;
+    padding: 0.5rem 4vw 32px 4vw;
+    box-sizing: border-box;
   }
 
 }
