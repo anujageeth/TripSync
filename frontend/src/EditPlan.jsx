@@ -21,6 +21,7 @@ function EditPlan() {
   const [breakfast, setBreakfast] = useState("");
   const [lunch, setLunch] = useState("");
   const [dinner, setDinner] = useState("");
+  const [otherMeals, setOtherMeals] = useState("");
 
   const [budget, setBudget] = useState(0);
   const [message, setMessage] = useState("");
@@ -32,8 +33,8 @@ function EditPlan() {
   const [cities, setCities] = useState([]);
   const [placeOptions, setPlaceOptions] = useState([]);
   const [hotels, setHotels] = useState([]);
-  const [mealsByType, setMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [] });
-  const [hotelMealsByType, setHotelMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [] });
+  const [mealsByType, setMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
+  const [hotelMealsByType, setHotelMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
 
   const findHotel = (id) => hotels.find((h) => String(h._id) === String(id));
   const findMealByName = (type, name) => {
@@ -46,17 +47,20 @@ function EditPlan() {
     try { return new Date(d).toISOString().slice(0, 10); } catch { return ""; }
   };
 
+  const API = `${process.env.REACT_APP_BACKEND_URL}`;
+
   useEffect(() => {
+    
     (async () => {
       try {
         const [citiesRes, mealsRes] = await Promise.all([
-          fetch("http://localhost:3001/cities"),
-          fetch("http://localhost:3001/meals"),
+          fetch(`${API}/cities`),
+          fetch(`${API}/meals`),
         ]);
         const citiesData = await citiesRes.json();
         const mealsData = await mealsRes.json();
         setCities(Array.isArray(citiesData) ? citiesData : []);
-        const grouped = { Breakfast: [], Lunch: [], Dinner: [] };
+        const grouped = { Breakfast: [], Lunch: [], Dinner: [], Other: [] };
         (Array.isArray(mealsData) ? mealsData : []).forEach((m) => {
           if (grouped[m.type]) grouped[m.type].push(m);
         });
@@ -78,7 +82,7 @@ function EditPlan() {
         }
         setLoading(true);
         setLoadError(null);
-        const res = await fetch(`http://localhost:3001/planner/plan/${encodeURIComponent(planId)}`);
+        const res = await fetch(`${API}/planner/plan/${encodeURIComponent(planId)}`);
         if (!res.ok) throw new Error(`Failed to load plan (${res.status})`);
         const found = await res.json();
         if (ignore) return;
@@ -94,6 +98,7 @@ function EditPlan() {
         setBreakfast(found.meals?.breakfast || "");
         setLunch(found.meals?.lunch || "");
         setDinner(found.meals?.dinner || "");
+        setOtherMeals(found.meals?.other || "");
         setBudget(typeof found.totalBudget === "number" ? found.totalBudget : 0);
       } catch (e) {
         if (!ignore) setLoadError(e.message || "Failed to load plan");
@@ -121,8 +126,8 @@ function EditPlan() {
     (async () => {
       try {
         const [placesRes, hotelsRes] = await Promise.all([
-          fetch(`http://localhost:3001/cities/${encodeURIComponent(cityId)}/places`),
-          fetch(`http://localhost:3001/hotels?cityId=${encodeURIComponent(cityId)}`),
+          fetch(`${API}/cities/${encodeURIComponent(cityId)}/places`),
+          fetch(`${API}/hotels?cityId=${encodeURIComponent(cityId)}`),
         ]);
         const placesData = await placesRes.json();
         const hotelsData = await hotelsRes.json();
@@ -143,21 +148,21 @@ function EditPlan() {
 
   useEffect(() => {
     if (!selectedHotelId) {
-      setHotelMealsByType({ Breakfast: [], Lunch: [], Dinner: [] });
+      setHotelMealsByType({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
       return;
     }
     (async () => {
       try {
-        const res = await fetch(`http://localhost:3001/hotels/${encodeURIComponent(selectedHotelId)}`);
+        const res = await fetch(`${API}/hotels/${encodeURIComponent(selectedHotelId)}`);
         if (!res.ok) throw new Error(`Failed to load hotel ${selectedHotelId}`);
         const data = await res.json();
         const available = Array.isArray(data.availableMeals) ? data.availableMeals : [];
-        const grouped = { Breakfast: [], Lunch: [], Dinner: [] };
+        const grouped = { Breakfast: [], Lunch: [], Dinner: [], Other: [] };
         available.forEach((m) => { if (grouped[m.type]) grouped[m.type].push(m); });
         setHotelMealsByType(grouped);
       } catch (e) {
         console.error("Failed to load hotel details", e);
-        setHotelMealsByType({ Breakfast: [], Lunch: [], Dinner: [] });
+        setHotelMealsByType({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
       }
     })();
   }, [selectedHotelId]);
@@ -167,8 +172,9 @@ function EditPlan() {
     const breakfastPrice = breakfast ? (findMealByName("Breakfast", breakfast)?.price || 0) : 0;
     const lunchPrice = lunch ? (findMealByName("Lunch", lunch)?.price || 0) : 0;
     const dinnerPrice = dinner ? (findMealByName("Dinner", dinner)?.price || 0) : 0;
+    const otherMealsPrice = otherMeals ? (findMealByName("Other", otherMeals)?.price || 0) : 0;
     const totalCost =
-      Number(hotelPrice) + Number(breakfastPrice) + Number(lunchPrice) + Number(dinnerPrice);
+      Number(hotelPrice) + Number(breakfastPrice) + Number(lunchPrice) + Number(dinnerPrice) + Number(otherMealsPrice);
     setBudget(Number.isFinite(totalCost) ? totalCost : 0);
   };
 
@@ -195,13 +201,13 @@ function EditPlan() {
       city,
       places: placeNames,
       hotel,
-      meals: { breakfast, lunch, dinner },
+      meals: { breakfast, lunch, dinner, other: otherMeals },
       totalBudget: budget,
       userId: localStorage.getItem("userId"),
     };
 
     try {
-      const res = await fetch(`http://localhost:3001/planner/${encodeURIComponent(planId)}`, {
+      const res = await fetch(`${API}/planner/${encodeURIComponent(planId)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -228,7 +234,7 @@ function EditPlan() {
     setCity(name);
     setPlaces([{ name: "" }]);
     setHotel(""); setSelectedHotelId("");
-    setBreakfast(""); setLunch(""); setDinner("");
+    setBreakfast(""); setLunch(""); setDinner(""); setOtherMeals("");
     setBudget(0);
   };
   const onPlaceSelect = (option) => {
@@ -248,13 +254,14 @@ function EditPlan() {
     const id = option?._id || "";
     setSelectedHotelId(id);
     setHotel(option?.name || "");
-    setBreakfast(""); setLunch(""); setDinner("");
+    setBreakfast(""); setLunch(""); setDinner(""); setOtherMeals("");
     setBudget(0);
     setHotelDetailsOpen(false);
   };
   const onBreakfastSelect = (option) => setBreakfast(option?.name || "");
   const onLunchSelect = (option) => setLunch(option?.name || "");
   const onDinnerSelect = (option) => setDinner(option?.name || "");
+  const onOtherMealsSelect = (option) => setOtherMeals(option?.name || "");
 
   if (loading) {
     return (
@@ -399,6 +406,16 @@ function EditPlan() {
                 displayKey="name"
                 valueKey="_id"
                 value={dinner}
+                disabled={!selectedHotelId}
+              />
+
+              <SearchableDropdown
+                options={selectedHotelId ? hotelMealsByType.Other : []}
+                onSelect={onOtherMealsSelect}
+                placeholder={selectedHotelId ? "Select Other Meals" : "Select a hotel first"}
+                displayKey="name"
+                valueKey="_id"
+                value={otherMeals}
                 disabled={!selectedHotelId}
               />
             </div>

@@ -12,22 +12,21 @@ function Hotels() {
   const [cities, setCities] = useState([]);
   const [hotels, setHotels] = useState([]);
 
-  // Filters
   const [cityId, setCityId] = useState('');
   const [query, setQuery] = useState('');
   const [minStars, setMinStars] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
-  // Details modal
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsHotel, setDetailsHotel] = useState(null);
 
-  // Load cities on mount
+  const API = `${process.env.REACT_APP_BACKEND_URL}`;
+
   useEffect(() => {
     (async () => {
       try {
         setError(null);
-        const res = await fetch('http://localhost:3001/cities');
+        const res = await fetch(`${API}/cities`);
         if (!res.ok) throw new Error(`/cities ${res.status}: ${await res.text()}`);
         const data = await res.json();
         setCities(Array.isArray(data) ? data : []);
@@ -44,8 +43,8 @@ function Hotels() {
         setLoading(true);
         setError(null);
         const url = cityId
-          ? `http://localhost:3001/hotels?cityId=${encodeURIComponent(cityId)}`
-          : 'http://localhost:3001/hotels';
+          ? `${API}/hotels?cityId=${encodeURIComponent(cityId)}`
+          : `${API}/hotels`;
         const res = await fetch(url, { signal: ctrl.signal });
         if (!res.ok) throw new Error(`/hotels ${res.status}: ${await res.text()}`);
         const data = await res.json();
@@ -99,7 +98,7 @@ function Hotels() {
             <SearchableDropdown
               options={cities}
               onSelect={onCitySelect}
-              placeholder="All Cities (search...)"
+              placeholder="Search city"
               displayKey="name"
               valueKey="_id"
               value={selectedCityName}

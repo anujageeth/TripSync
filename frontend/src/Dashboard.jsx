@@ -11,6 +11,8 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API = `${process.env.REACT_APP_BACKEND_URL}/planner`;
+
   useEffect(() => {
     let ignore = false;
 
@@ -24,7 +26,7 @@ function Dashboard() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`http://localhost:3001/planner/${uid}`);
+        const res = await fetch(`${API}/${uid}`);
         if (!res.ok) throw new Error(`Failed to load plans (${res.status})`);
         const data = await res.json();
 

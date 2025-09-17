@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import './CSS/UserProfile.css';
 import NavBar from './NavBar';
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
 
 function UserProfile() {
   const [loading, setLoading] = useState(true);

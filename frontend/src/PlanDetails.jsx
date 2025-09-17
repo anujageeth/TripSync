@@ -16,8 +16,10 @@ function PlanDetails() {
   const [hotelDetailsOpen, setHotelDetailsOpen] = useState(false);
   const [selectedHotelId, setSelectedHotelId] = useState('');
   const [initialHotel, setInitialHotel] = useState(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);     // NEW
-  const [deleting, setDeleting] = useState(false);           // NEW
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const API = `${process.env.REACT_APP_BACKEND_URL}`;
 
   useEffect(() => {
     let ignore = false;
@@ -33,7 +35,7 @@ function PlanDetails() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch(`http://localhost:3001/planner/${uid}`);
+        const res = await fetch(`${API}/planner/${uid}`);
         if (!res.ok) throw new Error(`Failed to load plans (${res.status})`);
         const data = await res.json();
         if (ignore) return;
@@ -91,7 +93,7 @@ function PlanDetails() {
     try {
       setDeleting(true);
       const id = plan?._id || planId;
-      const res = await fetch(`http://localhost:3001/planner/${encodeURIComponent(id)}`, {
+      const res = await fetch(`${API}/planner/${encodeURIComponent(id)}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
@@ -111,11 +113,11 @@ function PlanDetails() {
     if (!plan?.hotel) return;
     setInitialHotel({ name: plan.hotel });
     try {
-      const citiesRes = await fetch('http://localhost:3001/cities');
+      const citiesRes = await fetch(`${API}/cities`);
       const cities = await citiesRes.json();
       const cityDoc = Array.isArray(cities) ? cities.find(c => c?.name === plan.city) : null;
       if (cityDoc?._id) {
-        const hotelsRes = await fetch(`http://localhost:3001/hotels?cityId=${encodeURIComponent(cityDoc._id)}`);
+        const hotelsRes = await fetch(`${API}/hotels?cityId=${encodeURIComponent(cityDoc._id)}`);
         const hotels = await hotelsRes.json();
         const match = Array.isArray(hotels) ? hotels.find(h => h?.name === plan.hotel) : null;
         if (match?._id) setSelectedHotelId(match._id);

@@ -11,20 +11,23 @@ const usersRoutes = require('./routes/users.routes');
 
 const app = express();
 
-app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || '*',
-  })
-);
+app.use((req, _res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
 
-connectDB(); // uses process.env.MONGODB_URI
+app.use(express.json());
+const allowedOrigin = process.env.CORS_ORIGIN || '*';
+app.use(cors({ origin: allowedOrigin, credentials: true }));
+
+connectDB();
 
 app.get('/healthz', (_req, res) => res.json({ ok: true }));
 
 app.use(authRoutes);
 app.use(plannerRoutes);
-app.use(catalogRoutes);
+app.use('/api/catalog', catalogRoutes);
+app.use('/', catalogRoutes);
 app.use(usersRoutes);
 
 app.use((req, res) => {
@@ -32,4 +35,4 @@ app.use((req, res) => {
 });
 
 const PORT = Number(process.env.PORT || 3001);
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));

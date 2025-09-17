@@ -16,10 +16,12 @@ function BudgetPlans() {
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
 
+    const API = `${process.env.REACT_APP_BACKEND_URL}/planner/${userId}`;
+
     useEffect(() => {
         const fetchBudgetPlans = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/planner/${userId}`);
+                const response = await fetch(API);
                 if (response.ok) {
                     const data = await response.json();
                     setBudgetPlans(data);

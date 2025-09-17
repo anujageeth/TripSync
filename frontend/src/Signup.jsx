@@ -10,6 +10,8 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
+  const API = `${process.env.REACT_APP_BACKEND_URL}`;
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -18,7 +20,7 @@ function Signup() {
       return;
     }
 
-    axios.post('http://localhost:3001/register', { name, email, password })
+    axios.post(`${API}/register`, { name, email, password })
       .then(result => {
         console.log(result);
         navigate('/login');

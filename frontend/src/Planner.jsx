@@ -16,6 +16,7 @@ function Planner() {
   const [breakfast, setBreakfast] = useState("");
   const [lunch, setLunch] = useState("");
   const [dinner, setDinner] = useState("");
+  const [other, setOther] = useState("");
 
   const [budget, setBudget] = useState(0);
   const [message, setMessage] = useState("");
@@ -23,8 +24,8 @@ function Planner() {
   const [cities, setCities] = useState([]);
   const [placeOptions, setPlaceOptions] = useState([]);
   const [hotels, setHotels] = useState([]);
-  const [mealsByType, setMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [] });
-  const [hotelMealsByType, setHotelMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [] });
+  const [mealsByType, setMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
+  const [hotelMealsByType, setHotelMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
 
   const [hotelDetailsOpen, setHotelDetailsOpen] = useState(false);
 
@@ -35,18 +36,20 @@ function Planner() {
     return list.find(m => m.name === name);
   };
 
+  const API = `${process.env.REACT_APP_BACKEND_URL}`;
+
   useEffect(() => {
     (async () => {
       try {
         const [citiesRes, mealsRes] = await Promise.all([
-          fetch('http://localhost:3001/cities'),
-          fetch('http://localhost:3001/meals'),
+          fetch(`${API}/cities`),
+          fetch(`${API}/meals`),
         ]);
         const citiesData = await citiesRes.json();
         const mealsData = await mealsRes.json();
 
         setCities(Array.isArray(citiesData) ? citiesData : []);
-        const grouped = { Breakfast: [], Lunch: [], Dinner: [] };
+        const grouped = { Breakfast: [], Lunch: [], Dinner: [], Other: [] };
         (Array.isArray(mealsData) ? mealsData : []).forEach(m => {
           if (grouped[m.type]) grouped[m.type].push(m);
         });
@@ -66,8 +69,8 @@ function Planner() {
     (async () => {
       try {
         const [placesRes, hotelsRes] = await Promise.all([
-          fetch(`http://localhost:3001/cities/${encodeURIComponent(cityId)}/places`),
-          fetch(`http://localhost:3001/hotels?cityId=${encodeURIComponent(cityId)}`),
+          fetch(`${API}/cities/${encodeURIComponent(cityId)}/places`),
+          fetch(`${API}/hotels?cityId=${encodeURIComponent(cityId)}`),
         ]);
         const placesData = await placesRes.json();
         const hotelsData = await hotelsRes.json();
@@ -81,21 +84,21 @@ function Planner() {
 
   useEffect(() => {
     if (!selectedHotelId) {
-      setHotelMealsByType({ Breakfast: [], Lunch: [], Dinner: [] });
+      setHotelMealsByType({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
       return;
     }
     (async () => {
       try {
-        const res = await fetch(`http://localhost:3001/hotels/${encodeURIComponent(selectedHotelId)}`);
+        const res = await fetch(`${API}/hotels/${encodeURIComponent(selectedHotelId)}`);
         if (!res.ok) throw new Error(`Failed to load hotel ${selectedHotelId}`);
         const data = await res.json();
         const available = Array.isArray(data.availableMeals) ? data.availableMeals : [];
-        const grouped = { Breakfast: [], Lunch: [], Dinner: [] };
+        const grouped = { Breakfast: [], Lunch: [], Dinner: [], Other: [] };
         available.forEach(m => { if (grouped[m.type]) grouped[m.type].push(m); });
         setHotelMealsByType(grouped);
       } catch (e) {
         console.error('Failed to load hotel details', e);
-        setHotelMealsByType({ Breakfast: [], Lunch: [], Dinner: [] });
+        setHotelMealsByType({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
       }
     })();
   }, [selectedHotelId]);
@@ -106,8 +109,9 @@ function Planner() {
     const breakfastPrice = breakfast ? (findMealByName('Breakfast', breakfast)?.price || 0) : 0;
     const lunchPrice = lunch ? (findMealByName('Lunch', lunch)?.price || 0) : 0;
     const dinnerPrice = dinner ? (findMealByName('Dinner', dinner)?.price || 0) : 0;
+    const otherPrice = other ? (findMealByName('Other', other)?.price || 0) : 0;
 
-    const totalCost = Number(hotelPrice) + Number(breakfastPrice) + Number(lunchPrice) + Number(dinnerPrice);
+    const totalCost = Number(hotelPrice) + Number(breakfastPrice) + Number(lunchPrice) + Number(dinnerPrice) + Number(otherPrice);
     setBudget(Number.isFinite(totalCost) ? totalCost : 0);
   };
 
@@ -134,13 +138,13 @@ function Planner() {
       city,
       places: placeNames,
       hotel,
-      meals: { breakfast, lunch, dinner },
+      meals: { breakfast, lunch, dinner, other },
       totalBudget: budget,
       userId: localStorage.getItem("userId"),
     };
 
     try {
-      const response = await fetch('http://localhost:3001/planner', {
+      const response = await fetch(`${API}/planner`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(plannerData),
@@ -165,7 +169,7 @@ function Planner() {
     setCity(""); setCityId("");
     setPlaces([{ name: "" }]);
     setHotel(""); setSelectedHotelId("");
-    setBreakfast(""); setLunch(""); setDinner("");
+    setBreakfast(""); setLunch(""); setDinner(""); setOther("");
     setBudget(0);
     setMessage("");
   };
@@ -204,13 +208,14 @@ function Planner() {
     const id = option?._id || "";
     setSelectedHotelId(id);
     setHotel(option?.name || "");
-    setBreakfast(""); setLunch(""); setDinner("");
+    setBreakfast(""); setLunch(""); setDinner(""); setOther("");
     setBudget(0);
     setHotelDetailsOpen(false);
   };
   const onBreakfastSelect = (option) => setBreakfast(option?.name || "");
   const onLunchSelect = (option) => setLunch(option?.name || "");
   const onDinnerSelect = (option) => setDinner(option?.name || "");
+  const onOtherMealSelect = (option) => setOther(option?.name || "");
 
   const onPlaceSelect = (option) => {
     if (!option) return;
@@ -331,6 +336,13 @@ function Planner() {
                 options={selectedHotelId ? hotelMealsByType.Dinner : []}
                 onSelect={onDinnerSelect}
                 placeholder={selectedHotelId ? "Select Dinner" : "Select a hotel first"}
+                displayKey="name"
+                valueKey="_id"
+              />
+              <SearchableDropdown
+                options={selectedHotelId ? hotelMealsByType.Other : []}
+                onSelect={onOtherMealSelect}
+                placeholder={selectedHotelId ? "Select other meals" : "Select a hotel first"}
                 displayKey="name"
                 valueKey="_id"
               />

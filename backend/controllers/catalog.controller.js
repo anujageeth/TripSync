@@ -81,10 +81,75 @@ async function getHotelById(req, res) {
   }
 }
 
+async function createHotel(req, res) {
+  try {
+    console.log('createHotel payload:', req.body);
+    const {
+      name,
+      city,
+      address,
+      googleMapLink,
+      imageUrl,
+      rating,
+      starRating,
+      hasPool,
+      hasGym,
+      description,
+      specialFeatures,
+      roomPrice,
+      phone,
+      email,
+      availableMeals,
+      userId,
+      planId,
+    } = req.body || {};
+
+    const toObjectIds = (arr) =>
+      Array.isArray(arr)
+        ? arr
+            .filter((id) => mongoose.Types.ObjectId.isValid(id))
+            .map((id) => new mongoose.Types.ObjectId(id))
+        : [];
+
+    const doc = await HotelModel.create({
+      name: String(name ?? '').trim(),
+      city: toObjectIds(city),
+      address: String(address ?? '').trim(),
+      googleMapLink: googleMapLink ? String(googleMapLink).trim() : undefined,
+      imageUrl: imageUrl ? String(imageUrl).trim() : undefined,
+      rating:
+        rating === '' || typeof rating === 'undefined' ? undefined : Number(rating),
+      starRating:
+        starRating === '' || typeof starRating === 'undefined'
+          ? undefined
+          : Number(starRating),
+      hasPool: !!hasPool,
+      hasGym: !!hasGym,
+      description: String(description ?? '').trim(),
+      specialFeatures: Array.isArray(specialFeatures) ? specialFeatures : [],
+      roomPrice: Number(roomPrice),
+      phone: phone ? String(phone).trim() : undefined,
+      email: email ? String(email).trim().toLowerCase() : undefined,
+      availableMeals: toObjectIds(availableMeals),
+      ...(userId && mongoose.Types.ObjectId.isValid(userId) ? { userId } : {}),
+      ...(planId && mongoose.Types.ObjectId.isValid(planId) ? { planId } : {}),
+    });
+    console.log('Hotel created with id:', doc._id?.toString());
+    return res.status(201).json({ _id: doc._id, name: doc.name });
+  } catch (err) {
+    if (err?.name === 'ValidationError' || err?.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid hotel data', error: err.message });
+    }
+    console.error('Error creating hotel:', err);
+    res.status(500).json({ message: 'Error creating hotel', error: err?.message || err });
+  }
+}
+
 module.exports = {
   listCities,
   listVisitingPlaces,
   listHotels,
   listMeals,
   getHotelById,
+  createHotel,
 };

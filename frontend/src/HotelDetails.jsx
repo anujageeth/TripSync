@@ -8,6 +8,8 @@ function HotelDetails({ open, hotelId, initialHotel, onClose }) {
   const [hotel, setHotel] = useState(initialHotel || null);
   const [error, setError] = useState(null);
 
+  const API = `${process.env.REACT_APP_BACKEND_URL}`;
+
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
@@ -30,7 +32,7 @@ function HotelDetails({ open, hotelId, initialHotel, onClose }) {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:3001/hotels/${hotelId}`, { signal: ctrl.signal });
+        const res = await fetch(`${API}/hotels/${hotelId}`, { signal: ctrl.signal });
         if (!res.ok) throw new Error('details-unavailable');
         const data = await res.json();
         setHotel(data || initialHotel || null);

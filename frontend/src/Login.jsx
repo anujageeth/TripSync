@@ -8,9 +8,11 @@ function Login() {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
+    const API = process.env.REACT_APP_BACKEND_URL;
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:3001/login', { email, password })
+        axios.post(`${API}/login`, { email, password })
             .then(result => {
                 console.log("Login response:", result.data);
                 if (result.data.status === "Success") {
