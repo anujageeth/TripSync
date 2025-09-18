@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import Toast from './components/Toast';
 import './CSS/Login.css';
 
 function Signup() {
@@ -10,22 +11,30 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState('info');
+
   const API = `${process.env.REACT_APP_BACKEND_URL}`;
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      setToastType('error'); setToastMsg('Passwords do not match.'); setToastOpen(true);
       return;
     }
 
     axios.post(`${API}/register`, { name, email, password })
       .then(result => {
-        console.log(result);
-        navigate('/login');
+        setToastType('success'); setToastMsg('Account created successfully.'); setToastOpen(true);
+        setTimeout(() => navigate('/login'), 900);
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        setToastType('error');
+        setToastMsg(err?.response?.data?.message || 'Registration failed. Try again.');
+        setToastOpen(true);
+      });
   };
 
   return (
@@ -108,6 +117,14 @@ function Signup() {
           </Link>
         </div>
       </div>
+      
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        message={toastMsg}
+        duration={2500}
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Toast from './components/Toast';
 import NavBar from './NavBar';
 import './CSS/Planner.css';
 import SearchableDropdown from './components/SearchableDropdown';
@@ -28,6 +29,9 @@ function Planner() {
   const [hotelMealsByType, setHotelMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
 
   const [hotelDetailsOpen, setHotelDetailsOpen] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState('info');
 
   const findHotel = (id) => hotels.find(h => String(h._id) === String(id));
   const findMealByName = (type, name) => {
@@ -119,7 +123,7 @@ function Planner() {
     e.preventDefault();
     const placeNames = places.map(p => p.name).filter(Boolean);
     if (!date || !city || !hotel || placeNames.length === 0) {
-      alert("Please fill in date, city, at least one place and a hotel.");
+      setToastType('error'); setToastMsg('Fill in date, city, at least one place and a hotel.'); setToastOpen(true);
       return;
     }
     calculateBudget();
@@ -128,16 +132,13 @@ function Planner() {
   const handleSave = async () => {
     const placeNames = places.map(p => p.name).filter(Boolean);
     if (!date || !city || !hotel || placeNames.length === 0) {
-      alert("Please fill in date, city, at least one place and a hotel.");
+      setToastType('error'); setToastMsg('Fill in date, city, at least one place and a hotel.'); setToastOpen(true);
       return;
     }
     if (budget === 0) calculateBudget();
 
     const plannerData = {
-      date,
-      city,
-      places: placeNames,
-      hotel,
+      date, city, places: placeNames, hotel,
       meals: { breakfast, lunch, dinner, other },
       totalBudget: budget,
       userId: localStorage.getItem("userId"),
@@ -152,15 +153,14 @@ function Planner() {
       if (response.ok) {
         await response.json();
         setMessage("Budget saved successfully!");
+        setToastType('success'); setToastMsg('Plan saved successfully.'); setToastOpen(true);
         handleReset();
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error("Error response:", errorData);
-        alert('Error saving data');
+        setToastType('error'); setToastMsg(errorData?.message || 'Error saving plan.'); setToastOpen(true);
       }
     } catch (error) {
-      console.error("Catch error:", error);
-      alert('Error saving data');
+      setToastType('error'); setToastMsg('Error saving plan.'); setToastOpen(true);
     }
   };
 
@@ -239,11 +239,12 @@ function Planner() {
         <div className="plannerContainer">
           <h2 className="titleHomePage" id="plannerTitle">Plan Your Day</h2>
           <form onSubmit={handleSubmit} className="plannerBox">
-            <div className="mb-3" id="planDateInput">
+            <div className="mb-3 planDateGroup">
               <input
                 type="date"
                 className="formControlPlanner"
-                id="planDateInput"
+                id="planDate"
+                name="planDate"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
               />
@@ -377,6 +378,14 @@ function Planner() {
           )}
         </div>
       </div>
+
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        message={toastMsg}
+        duration={2500}
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 }

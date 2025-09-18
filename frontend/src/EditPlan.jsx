@@ -4,6 +4,7 @@ import NavBar from "./NavBar";
 import "./CSS/Planner.css";
 import SearchableDropdown from "./components/SearchableDropdown";
 import HotelDetails from "./HotelDetails";
+import Toast from "./components/Toast";
 
 function EditPlan() {
   const navigate = useNavigate();
@@ -29,6 +30,9 @@ function EditPlan() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [hotelDetailsOpen, setHotelDetailsOpen] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState('info');
 
   const [cities, setCities] = useState([]);
   const [placeOptions, setPlaceOptions] = useState([]);
@@ -191,16 +195,13 @@ function EditPlan() {
   const handleUpdate = async () => {
     const placeNames = places.map((p) => p.name).filter(Boolean);
     if (!date || !city || !hotel || placeNames.length === 0) {
-      alert("Please fill in date, city, at least one place and a hotel.");
+      setToastType('error'); setToastMsg('Fill in date, city, at least one place and a hotel.'); setToastOpen(true);
       return;
     }
     if (budget === 0) calculateBudget();
 
     const payload = {
-      date,
-      city,
-      places: placeNames,
-      hotel,
+      date, city, places: placeNames, hotel,
       meals: { breakfast, lunch, dinner, other: otherMeals },
       totalBudget: budget,
       userId: localStorage.getItem("userId"),
@@ -217,9 +218,10 @@ function EditPlan() {
         throw new Error(err.message || `Update failed (${res.status})`);
       }
       setMessage("Plan updated successfully!");
-      setTimeout(() => navigate(`/plans/${planId}`), 600);
+      setToastType('success'); setToastMsg('Plan updated successfully.'); setToastOpen(true);
+      setTimeout(() => navigate(`/plans/${planId}`), 900);
     } catch (e) {
-      alert(e.message || "Error updating plan");
+      setToastType('error'); setToastMsg(e?.message || 'Error updating plan.'); setToastOpen(true);
     }
   };
 
@@ -297,11 +299,12 @@ function EditPlan() {
         <div className="plannerContainer">
           <h2 className="titleHomePage" id="plannerTitle">Edit your Plan</h2>
           <form onSubmit={handleSubmit} className="plannerBox">
-            <div className="mb-3" id="planDateInput">
+            <div className="mb-3 planDateGroup">
               <input
                 type="date"
                 className="formControlPlanner"
-                id="planDateInput"
+                id="planDate"
+                name="planDate"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
               />
@@ -449,6 +452,14 @@ function EditPlan() {
           )}
         </div>
       </div>
+
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        message={toastMsg}
+        duration={2500}
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 }

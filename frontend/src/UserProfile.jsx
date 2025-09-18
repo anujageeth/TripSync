@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import './CSS/UserProfile.css';
 import NavBar from './NavBar';
+import Toast from './components/Toast';
 
 const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -22,6 +23,10 @@ function UserProfile() {
   const [passwordMsg, setPasswordMsg] = useState('');
   const [profileErr, setProfileErr] = useState('');
   const [passwordErr, setPasswordErr] = useState('');
+
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState('info');
 
   const userId = useMemo(() => localStorage.getItem('userId') || '', []);
   const token = useMemo(() => localStorage.getItem('token') || '', []);
@@ -80,8 +85,8 @@ function UserProfile() {
     e.preventDefault();
     setProfileMsg(''); setProfileErr('');
     const emailOk = /^\S+@\S+\.\S+$/.test(email);
-    if (!name.trim()) return setProfileErr('Name is required.');
-    if (!emailOk) return setProfileErr('Enter a valid email address.');
+    if (!name.trim()) { setProfileErr('Name is required.'); setToastType('error'); setToastMsg('Name is required.'); setToastOpen(true); return; }
+    if (!emailOk) { setProfileErr('Enter a valid email address.'); setToastType('error'); setToastMsg('Enter a valid email address.'); setToastOpen(true); return; }
 
     setSavingProfile(true);
     try {
@@ -100,6 +105,7 @@ function UserProfile() {
           throw new Error(err.message || `Update failed (${res.status})`);
         }
         setProfileMsg('Profile updated successfully.');
+        setToastType('success'); setToastMsg('Profile updated successfully.'); setToastOpen(true);
         return;
       }
 
@@ -114,12 +120,14 @@ function UserProfile() {
           throw new Error(err.message || `Update failed (${res2.status})`);
         }
         setProfileMsg('Profile updated successfully.');
+        setToastType('success'); setToastMsg('Profile updated successfully.'); setToastOpen(true);
         return;
       }
 
       throw new Error('Not authenticated.');
     } catch (e) {
       setProfileErr(e?.message || 'Failed to update profile.');
+      setToastType('error'); setToastMsg(e?.message || 'Failed to update profile.'); setToastOpen(true);
     } finally {
       setSavingProfile(false);
     }
@@ -130,13 +138,19 @@ function UserProfile() {
     setPasswordMsg(''); setPasswordErr('');
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      return setPasswordErr('Fill in all password fields.');
+      setPasswordErr('Fill in all password fields.');
+      setToastType('error'); setToastMsg('Fill in all password fields.'); setToastOpen(true);
+      return;
     }
     if (newPassword.length < 8) {
-      return setPasswordErr('New password must be at least 8 characters.');
+      setPasswordErr('New password must be at least 8 characters.');
+      setToastType('error'); setToastMsg('New password must be at least 8 characters.'); setToastOpen(true);
+      return;
     }
     if (newPassword !== confirmPassword) {
-      return setPasswordErr('New password and confirmation do not match.');
+      setPasswordErr('New password and confirmation do not match.');
+      setToastType('error'); setToastMsg('New password and confirmation do not match.'); setToastOpen(true);
+      return;
     }
 
     setChangingPassword(true);
@@ -157,6 +171,7 @@ function UserProfile() {
         }
         setPasswordMsg('Password changed successfully.');
         setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+        setToastType('success'); setToastMsg('Password changed successfully.'); setToastOpen(true);
         return;
       }
 
@@ -172,12 +187,14 @@ function UserProfile() {
         }
         setPasswordMsg('Password changed successfully.');
         setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+        setToastType('success'); setToastMsg('Password changed successfully.'); setToastOpen(true);
         return;
       }
 
       throw new Error('Not authenticated.');
     } catch (e) {
       setPasswordErr(e?.message || 'Failed to change password.');
+      setToastType('error'); setToastMsg(e?.message || 'Failed to change password.'); setToastOpen(true);
     } finally {
       setChangingPassword(false);
     }
@@ -300,6 +317,14 @@ function UserProfile() {
           )}
         </div>
       </div>
+
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        message={toastMsg}
+        duration={2500}
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 }

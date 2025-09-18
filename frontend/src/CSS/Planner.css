@@ -73,9 +73,15 @@
     align-items: center;
 }
 
-#planDateInput {
-    max-width: 430px;
-    padding-bottom: 8px;
+.planDateGroup {
+  width: 100%;
+  padding-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.formControlPlanner[type="date"] {
+  width: 95%;
+  min-width: 0;
 }
 
 .placeAddBtn {

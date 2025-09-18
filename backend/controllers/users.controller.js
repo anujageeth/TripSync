@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const EmployeeModel = require('../models/Employee');
 
 async function getUserById(req, res) {
@@ -46,9 +47,11 @@ async function updatePassword(req, res) {
     const user = await EmployeeModel.findById(id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (user.password !== currentPassword) return res.status(401).json({ message: 'Current password is incorrect' });
+    // Compare hashed password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) return res.status(401).json({ message: 'Current password is incorrect' });
 
-    user.password = newPassword;
+    user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
     res.json({ message: 'Password changed successfully' });
   } catch (err) {

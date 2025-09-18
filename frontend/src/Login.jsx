@@ -1,26 +1,40 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
-import './CSS/Login.css';
+import axios from "axios";
+import Toast from "./components/Toast";
+import "./CSS/Login.css";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
+    const [toastOpen, setToastOpen] = useState(false);
+    const [toastMsg, setToastMsg] = useState('');
+    const [toastType, setToastType] = useState('info');
+
     const API = process.env.REACT_APP_BACKEND_URL;
 
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.post(`${API}/login`, { email, password })
-            .then(result => {
-                console.log("Login response:", result.data);
-                if (result.data.status === "Success") {
-                    localStorage.setItem("userId", result.data.userId);
-                    navigate('/dashboard');
+            .then(res => {
+                if (res?.data?.status === 'Success') {
+                    localStorage.setItem('userId', res.data.userId);
+                    if (res.data.token) localStorage.setItem('token', res.data.token);
+                    setToastType('success'); setToastMsg('Logged in successfully.'); setToastOpen(true);
+                    setTimeout(() => navigate('/dashboard'), 900);
+                } else {
+                    setToastType('error');
+                    setToastMsg(res?.data?.message || 'Login failed. Check your credentials.');
+                    setToastOpen(true);
                 }
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                setToastType('error');
+                setToastMsg(err?.response?.data?.message || 'Login failed. Please try again.');
+                setToastOpen(true);
+            });
     };
 
     return (
@@ -73,6 +87,13 @@ function Login() {
               </Link>
             </div>
           </div>
+          <Toast
+            open={toastOpen}
+            type={toastType}
+            message={toastMsg}
+            duration={2500}
+            onClose={() => setToastOpen(false)}
+          />
         </div>
     );
 }

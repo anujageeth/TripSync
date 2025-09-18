@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import Toast from './components/Toast';
 import './CSS/AddHotel.css';
 import SearchableDropdown from './components/SearchableDropdown.jsx';
 import NavBar from './NavBar';
@@ -30,6 +31,10 @@ const AddHotel = () => {
 
   const [selectedMeals, setSelectedMeals] = useState([]);
   const [mealDropdownValue, setMealDropdownValue] = useState('');
+
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState('info');
 
   const selectedCityName = useMemo(
     () => (cities.find(c => String(c._id) === String(form.cityId))?.name) || '',
@@ -116,7 +121,10 @@ const AddHotel = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validate();
-    if (errors.length) { alert(errors.join('\n')); return; }
+    if (errors.length) { 
+      setToastType('error'); setToastMsg(errors.join(' ')); setToastOpen(true);
+      return;
+    }
 
     const payload = {
       name: form.name.trim(),
@@ -154,10 +162,9 @@ const AddHotel = () => {
       setFeatures([]);
       setSelectedMeals([]);
       setMealDropdownValue('');
-      alert('Hotel saved successfully');
+      setToastType('success'); setToastMsg('Hotel saved successfully.'); setToastOpen(true);
     } catch (err) {
-      console.error(err);
-      alert(err.message || 'Error saving hotel');
+      setToastType('error'); setToastMsg(err?.message || 'Error saving hotel'); setToastOpen(true);
     } finally {
       setLoading(false);
     }
@@ -360,6 +367,13 @@ const AddHotel = () => {
           </form>
         </div>
       </div>
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        message={toastMsg}
+        duration={2500}
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 };
