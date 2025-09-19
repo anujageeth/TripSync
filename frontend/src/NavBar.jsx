@@ -53,10 +53,11 @@ function NavBar() {
           <nav className="navLinks">
             <NavLink to="/dashboard" className="navLink">Dashboard</NavLink>
             <NavLink to="/planner" className="navLink">Create Plan</NavLink>
-            <NavLink to="/collections" className="navLink">Collections</NavLink>
-            <NavLink to="/plans" className="navLink">My Plans</NavLink>
+            <NavLink to="/collections" className="navLink">Travel Plans</NavLink>
+            <NavLink to="/plans" className="navLink">Day Plans</NavLink>
             <NavLink to="/hotels" className="navLink">Hotels</NavLink>
             <NavLink to="/map" className="navLink">Map</NavLink>
+            <NavLink to="/profile" className="navLink">Profile</NavLink>
             <button type="button" className="navLink navButton" onClick={handleLogout}>Logout</button>
           </nav>
         )}
@@ -89,8 +90,8 @@ function NavBar() {
             >
               <NavLink to="/dashboard" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Dashboard</NavLink>
               <NavLink to="/planner" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Create Plan</NavLink>
-              <NavLink to="/collections" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Collections</NavLink>
-              <NavLink to="/plans" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Plans</NavLink>
+              <NavLink to="/collections" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Travel Plans</NavLink>
+              <NavLink to="/plans" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Day Plans</NavLink>
               <NavLink to="/hotels" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Hotels</NavLink>
               <NavLink to="/map" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Map</NavLink>
               <NavLink to="/profile" className="mobileNavLink" onClick={closeMenuAnd(() => {})}>Profile</NavLink>

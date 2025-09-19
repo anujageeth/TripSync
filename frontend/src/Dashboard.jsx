@@ -92,6 +92,18 @@ function Dashboard() {
 
             <div
               className="qaCard"
+              onClick={() => navigate('/collections')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate('/collections')}
+              aria-label="Open collections"
+            >
+              <div className="qaIcon" aria-hidden="true"><User size={28} /></div>
+              <h3>Travel Plans</h3>
+            </div>
+
+            <div
+              className="qaCard"
               onClick={() => navigate('/plans')}
               role="button"
               tabIndex={0}
@@ -99,7 +111,7 @@ function Dashboard() {
               aria-label="View saved plans"
             >
               <div className="qaIcon" aria-hidden="true"><List size={28} /></div>
-              <h3>My Plans</h3>
+              <h3>Day Plans</h3>
             </div>
 
             <div
@@ -112,18 +124,6 @@ function Dashboard() {
             >
               <div className="qaIcon" aria-hidden="true"><Building2 size={28} /></div>
               <h3>Hotels</h3>
-            </div>
-
-            <div
-              className="qaCard"
-              onClick={() => navigate('/profile')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && navigate('/profile')}
-              aria-label="Open profile settings"
-            >
-              <div className="qaIcon" aria-hidden="true"><User size={28} /></div>
-              <h3>Profile</h3>
             </div>
           </section>
 
