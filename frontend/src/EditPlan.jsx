@@ -5,12 +5,12 @@ import "./CSS/Planner.css";
 import SearchableDropdown from "./components/SearchableDropdown";
 import HotelDetails from "./HotelDetails";
 import Toast from "./components/Toast";
+import CreateCollection from "./components/CreateCollection";
 
 function EditPlan() {
   const navigate = useNavigate();
   const { id: planId } = useParams();
 
-  // Form state
   const [date, setDate] = useState("");
   const [city, setCity] = useState("");
   const [cityId, setCityId] = useState("");
@@ -40,6 +40,11 @@ function EditPlan() {
   const [mealsByType, setMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
   const [hotelMealsByType, setHotelMealsByType] = useState({ Breakfast: [], Lunch: [], Dinner: [], Other: [] });
 
+  const [collections, setCollections] = useState([]);
+  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [createCollectionOpen, setCreateCollectionOpen] = useState(false);
+  const [originalCollectionId, setOriginalCollectionId] = useState(null);
+
   const findHotel = (id) => hotels.find((h) => String(h._id) === String(id));
   const findMealByName = (type, name) => {
     if (!name) return undefined;
@@ -52,9 +57,32 @@ function EditPlan() {
   };
 
   const API = `${process.env.REACT_APP_BACKEND_URL}`;
+  const currentUserId = localStorage.getItem("userId");
+
+  const isValidObjectId = (s) => typeof s === 'string' && /^[0-9a-fA-F]{24}$/.test(s);
+  const fetchCollections = async () => {
+    try {
+      const qs = isValidObjectId(currentUserId) ? `?userId=${encodeURIComponent(currentUserId)}` : '';
+      const res = await fetch(`${API}/collections${qs}`);
+      if (!res.ok) {
+        if (qs) {
+          const resAll = await fetch(`${API}/collections`);
+          if (!resAll.ok) throw new Error(`Failed to load collections (${resAll.status})`);
+          const all = await resAll.json();
+          setCollections(Array.isArray(all) ? all : []);
+          return;
+        }
+        throw new Error(`Failed to load collections (${res.status})`);
+      }
+      const data = await res.json();
+      setCollections(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Failed to load collections', e);
+      setCollections([]);
+    }
+  };
 
   useEffect(() => {
-    
     (async () => {
       try {
         const [citiesRes, mealsRes] = await Promise.all([
@@ -75,6 +103,7 @@ function EditPlan() {
     })();
   }, []);
 
+  // Load plan
   useEffect(() => {
     let ignore = false;
     (async () => {
@@ -112,6 +141,20 @@ function EditPlan() {
     })();
     return () => { ignore = true; };
   }, [planId]);
+
+  useEffect(() => {
+    fetchCollections();
+  }, [API]);
+
+  useEffect(() => {
+    if (!planId || !collections.length) return;
+    const match = collections.find(c =>
+      Array.isArray(c.dayPlans) &&
+      c.dayPlans.some(dp => String((typeof dp === 'string' ? dp : dp?._id)) === String(planId))
+    );
+    setSelectedCollection(match || null);
+    setOriginalCollectionId(match?._id || null);
+  }, [planId, collections]);
 
   useEffect(() => {
     if (city && !cityId && Array.isArray(cities) && cities.length) {
@@ -217,6 +260,51 @@ function EditPlan() {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || `Update failed (${res.status})`);
       }
+
+      if (selectedCollection?._id) {
+        try {
+          const existingIds = Array.isArray(selectedCollection.dayPlans)
+            ? selectedCollection.dayPlans.map(dp => (typeof dp === 'string' ? dp : dp?._id)).filter(Boolean)
+            : [];
+          const mergedIds = Array.from(new Set([...existingIds.map(String), String(planId)]));
+
+          const patchRes = await fetch(`${API}/collections/${encodeURIComponent(selectedCollection._id)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dayPlanIds: mergedIds }),
+          });
+
+          if (patchRes.ok) {
+            const updatedCollection = await patchRes.json();
+            setCollections(prev => prev.map(c => String(c._id) === String(updatedCollection._id) ? updatedCollection : c));
+            setSelectedCollection(updatedCollection);
+          } else {
+            const msg = await patchRes.json().catch(() => ({}));
+            setToastType('error'); setToastMsg(msg?.message || 'Plan updated, but failed to update its collection.'); setToastOpen(true);
+          }
+        } catch {
+          setToastType('error'); setToastMsg('Plan updated, but failed to update its collection.'); setToastOpen(true);
+        }
+      }
+
+      if (originalCollectionId && (!selectedCollection?._id || String(selectedCollection._id) !== String(originalCollectionId))) {
+        const original = collections.find(c => String(c._id) === String(originalCollectionId));
+        if (original) {
+          try {
+            const remainingIds = (Array.isArray(original.dayPlans) ? original.dayPlans : [])
+              .map(dp => (typeof dp === 'string' ? dp : dp?._id))
+              .filter(id => id && String(id) !== String(planId));
+
+            await fetch(`${API}/collections/${encodeURIComponent(original._id)}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ dayPlanIds: remainingIds }),
+            });
+          } catch {
+          }
+        }
+      }
+
       setMessage("Plan updated successfully!");
       setToastType('success'); setToastMsg('Plan updated successfully.'); setToastOpen(true);
       setTimeout(() => navigate(`/plans/${planId}`), 900);
@@ -299,6 +387,26 @@ function EditPlan() {
         <div className="plannerContainer">
           <h2 className="titleHomePage" id="plannerTitle">Edit your Plan</h2>
           <form onSubmit={handleSubmit} className="plannerBox">
+
+            {/* <div className="mb-3">
+              <SearchableDropdown
+                options={collections}
+                onSelect={(opt) => setSelectedCollection(opt)}
+                placeholder="Select Collection"
+                displayKey="name"
+                valueKey="_id"
+                value={selectedCollection?.name || ''}
+              />
+              <button
+                type="button"
+                className="placeAddBtn"
+                id="createCollectionBtn"
+                onClick={() => setCreateCollectionOpen(true)}
+              >
+                Create Collection
+              </button>
+            </div> */}
+
             <div className="mb-3 planDateGroup">
               <input
                 type="date"
@@ -373,12 +481,12 @@ function EditPlan() {
                     View Hotel Details
                   </button>
 
-                  <HotelDetails
-                    open={hotelDetailsOpen}
-                    hotelId={selectedHotelId}
-                    initialHotel={findHotel(selectedHotelId)}
-                    onClose={() => setHotelDetailsOpen(false)}
-                  />
+                    <HotelDetails
+                      open={hotelDetailsOpen}
+                      hotelId={selectedHotelId}
+                      initialHotel={findHotel(selectedHotelId)}
+                      onClose={() => setHotelDetailsOpen(false)}
+                    />
                 </>
               )}
             </div>
@@ -452,6 +560,23 @@ function EditPlan() {
           )}
         </div>
       </div>
+
+      <CreateCollection
+        isOpen={createCollectionOpen}
+        onClose={() => setCreateCollectionOpen(false)}
+        userId={currentUserId}
+        onCreated={async (created) => {
+          if (created && created._id) {
+            setCollections(prev => {
+              const exists = prev.some(c => String(c._id) === String(created._id));
+              return exists ? prev : [created, ...prev];
+            });
+            setSelectedCollection(created);
+            setOriginalCollectionId(created._id || originalCollectionId);
+          }
+          await fetchCollections();
+        }}
+      />
 
       <Toast
         open={toastOpen}

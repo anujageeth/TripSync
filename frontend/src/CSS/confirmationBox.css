@@ -10,7 +10,7 @@
 
 .confirmationDialog {
   width: min(520px, 92vw);
-  background: linear-gradient(rgba(255, 255, 255, 0.766), rgba(255, 255, 255, 0.492));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.534), rgba(255, 255, 255, 0.348));
   border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 20px;
   color: #000;
@@ -22,13 +22,13 @@
 
 .confirmationTitle {
   margin: 0 0 8px 0;
-  font-weight: 800;
-  color: #000;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .confirmationMessage {
   margin: 0 0 16px 0;
-  color: #000;
+  color: #ffffff;
 }
 
 .confirmationActions {
@@ -41,4 +41,9 @@
 .confirmationBtn {
   padding: 8px 14px;
   box-shadow: none;
+  border: none;
+}
+
+.confirmationBtn:hover {
+  box-shadow: 0 6px 20px rgba(251, 255, 0, 0.18);
 }

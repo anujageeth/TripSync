@@ -68,11 +68,7 @@ function BudgetPlans() {
         return textMatch && dateMatch;
       });
     }, [budgetPlans, filterText, filterDate]);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
+ 
     const resetHotelSearch = () => {
       setFilterText('');
       setFilterDate('');
@@ -127,11 +123,30 @@ function BudgetPlans() {
                 )}
               </div>
 
-              {!hasAny ? (
-                <p>No budget plans found.</p>
-              ) : listToShow.length === 0 ? (
-                <p>No plans match your filters.</p>
-              ) : (
+              {loading ? (
+                <div className="budgetGrid">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <article key={i} className="budgetCard" aria-hidden="true">
+                      <div className="budgetHeader">
+                        <div className="plansSkeleton plansSkeletonTitle"></div>
+                        <div className="plansSkeleton plansSkeletonPill"></div>
+                      </div>
+                      <ul className="budgetMetaList">
+                        <li className="budgetMetaItem"><span className="plansSkeleton plansSkeletonLine" style={{ width: '70%' }} /></li>
+                        <li className="budgetMetaItem"><span className="plansSkeleton plansSkeletonLine" style={{ width: '55%' }} /></li>
+                        <li className="budgetMetaItem"><span className="plansSkeleton plansSkeletonLine" style={{ width: '40%' }} /></li>
+                      </ul>
+                      <div className="budgetFooter">
+                        <div className="plansSkeleton plansSkeletonBtn"></div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : !hasAny ? (
+                 <p>No budget plans found.</p>
+               ) : listToShow.length === 0 ? (
+                 <p>No plans match your filters.</p>
+               ) : (
                 <div className="budgetGrid">
                   {listToShow.map((plan) => {
                     const places = Array.isArray(plan.places) ? plan.places.filter(Boolean) : [];

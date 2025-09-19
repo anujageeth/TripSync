@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import Toast from './components/Toast';
 import NavBar from './NavBar';
 import './CSS/Planner.css';
 import SearchableDropdown from './components/SearchableDropdown';
 import HotelDetails from './HotelDetails';
+import CreateCollection from './components/CreateCollection'; // added
 
 function Planner() {
   const [date, setDate] = useState("");
@@ -33,6 +35,12 @@ function Planner() {
   const [toastMsg, setToastMsg] = useState('');
   const [toastType, setToastType] = useState('info');
 
+  const [collections, setCollections] = useState([]);
+  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [createCollectionOpen, setCreateCollectionOpen] = useState(false);
+
+  const navigate = useNavigate();
+
   const findHotel = (id) => hotels.find(h => String(h._id) === String(id));
   const findMealByName = (type, name) => {
     if (!name) return undefined;
@@ -41,6 +49,20 @@ function Planner() {
   };
 
   const API = `${process.env.REACT_APP_BACKEND_URL}`;
+  const currentUserId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    (async () => {
+      try {
+        const res = await fetch(`${API}/collections?userId=${encodeURIComponent(currentUserId)}`);
+        const data = await res.json();
+        setCollections(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error('Failed to load collections', e);
+      }
+    })();
+  }, [API, currentUserId]);
 
   useEffect(() => {
     (async () => {
@@ -150,15 +172,46 @@ function Planner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(plannerData),
       });
-      if (response.ok) {
-        await response.json();
-        setMessage("Budget saved successfully!");
-        setToastType('success'); setToastMsg('Plan saved successfully.'); setToastOpen(true);
-        handleReset();
-      } else {
+
+      if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         setToastType('error'); setToastMsg(errorData?.message || 'Error saving plan.'); setToastOpen(true);
+        return;
       }
+
+      const createdPlan = await response.json();
+
+      if (selectedCollection?._id) {
+        try {
+          const existingIds = Array.isArray(selectedCollection.dayPlans)
+            ? selectedCollection.dayPlans.map(dp => (typeof dp === 'string' ? dp : dp?._id)).filter(Boolean)
+            : [];
+
+          const mergedIds = Array.from(new Set([...existingIds.map(String), String(createdPlan._id)]));
+
+          const patchRes = await fetch(`${API}/collections/${encodeURIComponent(selectedCollection._id)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dayPlanIds: mergedIds }),
+          });
+
+          if (patchRes.ok) {
+            const updatedCollection = await patchRes.json();
+            setCollections(prev => prev.map(c => String(c._id) === String(updatedCollection._id) ? updatedCollection : c));
+            setSelectedCollection(updatedCollection);
+          } else {
+            const msg = await patchRes.json().catch(() => ({}));
+            setToastType('error'); setToastMsg(msg?.message || 'Saved plan, but failed to add it to the collection.'); setToastOpen(true);
+          }
+        } catch (e) {
+          setToastType('error'); setToastMsg('Saved plan, but failed to add it to the collection.'); setToastOpen(true);
+        }
+      }
+
+      setMessage("Budget saved successfully!");
+      setToastType('success'); setToastMsg('Plan saved successfully.'); setToastOpen(true);
+      handleReset();
+      navigate(`/plans`);
     } catch (error) {
       setToastType('error'); setToastMsg('Error saving plan.'); setToastOpen(true);
     }
@@ -239,6 +292,26 @@ function Planner() {
         <div className="plannerContainer">
           <h2 className="titleHomePage" id="plannerTitle">Plan Your Day</h2>
           <form onSubmit={handleSubmit} className="plannerBox">
+            
+            <div className="mb-3">
+              <SearchableDropdown
+                options={collections}
+                onSelect={(opt) => setSelectedCollection(opt)}
+                placeholder="Select Collection"
+                displayKey="name"
+                valueKey="_id"
+                value={selectedCollection?.name || ''}
+              />
+              <button
+                type="button"
+                className="placeAddBtn"
+                id="viewHotelDetailsBtn"
+                onClick={() => setCreateCollectionOpen(true)}
+              >
+                Create Collection
+              </button>
+            </div>
+            
             <div className="mb-3 planDateGroup">
               <input
                 type="date"
@@ -378,6 +451,22 @@ function Planner() {
           )}
         </div>
       </div>
+
+      <CreateCollection
+        isOpen={createCollectionOpen}
+        onClose={() => setCreateCollectionOpen(false)}
+        userId={currentUserId}
+        onCreated={async (created) => {
+          try {
+            const res = await fetch(`${API}/collections?userId=${encodeURIComponent(currentUserId)}`);
+            const data = await res.json();
+            setCollections(Array.isArray(data) ? data : []);
+            setSelectedCollection(created || null);
+          } catch (e) {
+            console.error('Failed to refresh collections', e);
+          }
+        }}
+      />
 
       <Toast
         open={toastOpen}

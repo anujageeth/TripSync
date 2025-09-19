@@ -280,6 +280,23 @@
     padding-bottom: 50px;
 }
 
+@keyframes hotelSkeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.hotelSkeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.18) 25%, rgba(255,255,255,0.35) 37%, rgba(255,255,255,0.18) 63%);
+  background-size: 400% 100%;
+  animation: hotelSkeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+.hotelSkeletonLine { height: 12px; border-radius: 6px; }
+.hotelSkeletonTitle { height: 20px; width: 70%; }
+.hotelSkeletonStars { height: 16px; width: 90px; }
+.hotelSkeletonCity { height: 14px; width: 50%; }
+.hotelSkeletonPrice { height: 18px; width: 80px; }
+.hotelSkeletonBtn { width: 100px; height: 34px; border-radius: 20px; }
+
 @media (max-width: 768px) {
     .hotelsContainer {
         padding: 15px;

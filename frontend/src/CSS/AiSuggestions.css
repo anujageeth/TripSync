@@ -1,0 +1,77 @@
+.aiCard {
+  width: 900px;
+  max-width: 90vw;
+  max-height: 70vh;
+}
+
+.aiBody {
+  display: grid;
+  gap: 12px;
+}
+
+.aiToolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.aiSaveMsg {
+  color: #d1ffd1;
+  background: rgba(0, 128, 0, 0.18);
+  border: 1px solid rgba(0, 128, 0, 0.35);
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.aiError {
+  padding: 6px 10px;
+}
+
+.aiOutput {
+  min-height: 180px;
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 20px;
+  white-space: pre-wrap;
+  background: rgba(0, 0, 0, 0.441);
+  color: #fff;
+  position: relative;
+}
+
+@keyframes ai-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.aiOutput.thinking {
+  color: transparent;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.07) 25%,
+    rgba(255,255,255,0.16) 37%,
+    rgba(255,255,255,0.07) 63%
+  );
+  background-size: 400% 100%;
+  animation: ai-shimmer 1.4s ease-in-out infinite;
+}
+.aiOutput.thinking::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: ai-spin 0.9s linear infinite;
+}
+@keyframes ai-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ccBtn {
+  border-radius: 12px;
+}

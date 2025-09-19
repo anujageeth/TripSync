@@ -136,7 +136,21 @@ function Dashboard() {
             </div>
 
             <div className="plansList">
-              {loading && <div className="planItem">Loading plans...</div>}
+              {loading && (
+                <>
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={`sk-${i}`} className="planItem" aria-hidden="true">
+                      <div className="planInfo" style={{ width: '100%' }}>
+                        <div className="dashSkeleton dashSkeletonLine" style={{ width: '45%', height: 20, marginBottom: 8 }}></div>
+                        <div className="dashSkeleton dashSkeletonLine" style={{ width: '60%', height: 14 }}></div>
+                      </div>
+                      <div className="planActions">
+                        <div className="dashSkeleton dashSkeletonBtn"></div>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
               {!loading && error && <div className="planItem">Error: {error}</div>}
               {!loading && !error && recentPlans.length === 0 && (
                 <div className="planItem">No plans yet. Create your first plan!</div>

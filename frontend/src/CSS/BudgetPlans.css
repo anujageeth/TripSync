@@ -302,17 +302,17 @@
   color: #fff;
 }
 
-@media (max-width: 768px) {
-  .budgetContainer { padding: 15px; }
-  .budgetTitle { font-size: 2rem; margin-bottom: 20px; }
-  .budgetFilters { flex-direction: column; gap: 10px; }
-  .budgetSelect, .budgetInput { width: 100%; min-width: unset; }
-  .budgetGrid { grid-template-columns: 1fr; gap: 15px; }
+@keyframes plansSkeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
-@media (max-width: 480px) {
-  .budgetContainer { padding: 10px; }
-  .budgetCard { padding: 15px; }
-  .budgetName { font-size: 18px; }
-  .budgetFooter { flex-direction: column; gap: 8px; }
-  .budgetBtn { text-align: center; }
+.plansSkeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.18) 25%, rgba(255,255,255,0.35) 37%, rgba(255,255,255,0.18) 63%);
+  background-size: 400% 100%;
+  animation: plansSkeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
 }
+.plansSkeletonTitle { height: 22px; width: 60%; }
+.plansSkeletonPill { height: 24px; width: 120px; border-radius: 999px; }
+.plansSkeletonLine { height: 12px; border-radius: 6px; }
+.plansSkeletonBtn { width: 120px; height: 34px; border-radius: 20px; }

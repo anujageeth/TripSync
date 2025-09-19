@@ -8,6 +8,8 @@ const authRoutes = require('./routes/auth.routes');
 const plannerRoutes = require('./routes/planner.routes');
 const catalogRoutes = require('./routes/catalog.routes');
 const usersRoutes = require('./routes/users.routes');
+const collectionRoutes = require('./routes/collection.routes');
+const aiRoutes = require('./routes/ai.routes');
 
 const app = express();
 
@@ -29,6 +31,8 @@ app.use(plannerRoutes);
 app.use('/api/catalog', catalogRoutes);
 app.use('/', catalogRoutes);
 app.use(usersRoutes);
+app.use(collectionRoutes);
+app.use('/ai', aiRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: `Route not found: ${req.method} ${req.originalUrl}` });

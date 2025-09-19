@@ -11,6 +11,10 @@ import Hotels from './Hotels';
 import UserProfile from './UserProfile';
 import Map from './Map'
 import AddHotel from './AddHotel'
+import CreateCollection from './components/CreateCollection';
+import PlanCollections from './PlanCollections';
+import CollectionDetails from './CollectionDetails'
+import PageNotFound from './PageNotFound'
 
 function RequireAuth() {
   const authed = Boolean(localStorage.getItem('userId'));
@@ -38,10 +42,13 @@ function App() {
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/map" element={<Map />} />
           <Route path="/add-hotel" element={<AddHotel />} />
+          <Route path="/create-collection" element={<CreateCollection />} />
+          <Route path="/collections" element={<PlanCollections />} />
+          <Route path="/collections/:id" element={<CollectionDetails />} />
         </Route>
 
         {/* Fallback */}
-        <Route path="*" element={<h2 style={{padding: '2rem', alignContent: 'center'}}>404 Not Found</h2>} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
   )

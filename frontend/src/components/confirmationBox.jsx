@@ -1,4 +1,6 @@
-import React from 'react';
+import { React, useState } from 'react';
+
+import Toast from './Toast';
 import '../CSS/confirmationBox.css';
 
 function ConfirmationBox({
@@ -10,15 +12,41 @@ function ConfirmationBox({
   onConfirm,
   onCancel,
   loading = false,
+
+  confirmToastMessage = 'Confirmed',
+  cancelToastMessage = 'Cancelled',
+  confirmToastType = 'info',
+  cancelToastType = 'info',
+  toastDuration = 2000,
 }) {
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastType, setToastType] = useState('info');
+  const [toastMsg, setToastMsg] = useState('');
+
   if (!open) return null;
+
+  const showToast = (msg, type = 'info') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setToastOpen(true);
+  };
+
+  const handleCancel = () => {
+    showToast(cancelToastMessage, cancelToastType);
+    onCancel?.();
+  };
+
+  const handleConfirm = () => {
+    showToast(confirmToastMessage, confirmToastType);
+    onConfirm?.();
+  };
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       className="confirmationOverlay"
-      onClick={onCancel}
+      onClick={handleCancel}
     >
       <div className="confirmationDialog" onClick={(e) => e.stopPropagation()}>
         <h3 className="confirmationTitle">{title}</h3>
@@ -26,7 +54,7 @@ function ConfirmationBox({
         <div className="confirmationActions">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={handleCancel}
             disabled={loading}
             className="backBtn confirmationBtn"
           >
@@ -34,7 +62,7 @@ function ConfirmationBox({
           </button>
           <button
             type="button"
-            onClick={onConfirm}
+            onClick={handleConfirm}
             disabled={loading}
             className="backBtn confirmationBtn"
             id="deletePlanBtn"
@@ -43,6 +71,14 @@ function ConfirmationBox({
           </button>
         </div>
       </div>
+
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        message={toastMsg}
+        duration={2500}
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 }

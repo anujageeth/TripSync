@@ -122,16 +122,34 @@ function Hotels() {
             />
           </div>
           
-          {loading && <div className="hotelsStatus">Loading hotels...</div>}
+          {loading && (
+            <div className="hotelsGrid">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div className="hotelCard" key={`s-${i}`} aria-hidden="true">
+                  <div className="hotelHeader">
+                    <div className="hotelSkeleton hotelSkeletonTitle"></div>
+                    <div className="hotelSkeleton hotelSkeletonStars"></div>
+                  </div>
+                  <div className="hotelMeta">
+                    <div className="hotelSkeleton hotelSkeletonCity"></div>
+                    <div className="hotelSkeleton hotelSkeletonPrice" style={{ marginTop: 8 }}></div>
+                  </div>
+                  <div className="hotelFooter">
+                    <div className="hotelSkeleton hotelSkeletonBtn"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           {error && <div className="hotelsError">Error: {error}</div>}
 
           {!loading && !error && (
-            <div className="hotelsGrid">
-              {filtered.length === 0 && (
-                <div className="hotelsStatus">No hotels found.</div>
-              )}
+             <div className="hotelsGrid">
+               {filtered.length === 0 && (
+                 <div className="hotelsStatus">No hotels found.</div>
+               )}
 
-              {filtered.map(h => (
+               {filtered.map(h => (
                 <div className="hotelCard" key={h._id}>
                   <div className="hotelHeader">
                     <div className="hotelName">{h.name}</div>

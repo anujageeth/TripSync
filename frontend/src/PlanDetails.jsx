@@ -246,7 +246,7 @@ function PlanDetails() {
           <div className="planHeader">
             <h1 className="planTitle">{title}</h1>
             <div className="planHeaderActions">
-              <button className="backBtn" onClick={() => navigate('/plans')} aria-label="Go back">
+              <button className="backBtn" onClick={() => navigate(-1)} aria-label="Go back">
                 <ArrowLeft size={16} /> Back
               </button>
               <div style={{ display: 'inline-flex', gap: 10 }}>
