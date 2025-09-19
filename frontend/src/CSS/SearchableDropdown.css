@@ -1,6 +1,7 @@
 .searchable-dropdown {
   position: relative;
   width: 100%;
+  max-width: 95vw;
   padding-bottom: 15px;
   box-sizing: border-box;
 }
