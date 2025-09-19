@@ -9,7 +9,8 @@
 }
 
 .confirmationDialog {
-  width: min(520px, 92vw);
+  width: 520px;
+  max-width: 90vw;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.534), rgba(255, 255, 255, 0.348));
   border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 20px;
